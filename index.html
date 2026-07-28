@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Nexora</title>
+
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+
+body{
+    background:#f4f4f4;
+    color:#333;
+}
+
+
+
+header{
+
+    background:#222;
+
+    color:white;
+
+    padding:20px 40px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+}
+
+
+
+.logo{
+
+    font-size:32px;
+
+    font-weight:bold;
+
+}
+
+
+
+nav{
+
+    display:flex;
+
+    gap:20px;
+
+    align-items:center;
+
+}
+
+
+
+nav a{
+
+    color:white;
+
+    text-decoration:none;
+
+}
+
+
+
+nav a:hover{
+
+    color:#00bfff;
+
+}
+
+
+
+.user{
+
+    color:#00bfff;
+
+    font-size:14px;
+
+}
+
+
+
+.logout{
+
+    background:#dc3545;
+
+    padding:8px 15px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+
+
+.logout:hover{
+
+    background:#a71d2a;
+
+}
+
+
+
+
+.search{
+
+    padding:30px;
+
+    text-align:center;
+
+}
+
+
+
+.search input{
+
+    width:80%;
+
+    max-width:650px;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    border:1px solid #ccc;
+
+    font-size:17px;
+
+}
+
+
+
+
+
+.product-table{
+
+    width:95%;
+
+    margin:20px auto;
+
+    border-collapse:collapse;
+
+    background:white;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+
+}
+
+
+
+.product-table th{
+
+    background:#222;
+
+    color:white;
+
+    padding:18px;
+
+}
+
+
+
+.product-table td{
+
+    border:1px solid #ddd;
+
+    padding:20px;
+
+    text-align:center;
+
+    vertical-align:middle;
+
+}
+
+
+
+.product-table tr:nth-child(even){
+
+    background:#f8f8f8;
+
+}
+
+
+
+.product-table tr:hover{
+
+    background:#eef7ff;
+
+}
+
+
+
+.product-table td:first-child{
+
+    width:320px;
+
+}
+
+
+
+.product-table img{
+
+    width:100%;
+
+    max-width:300px;
+
+    height:220px;
+
+    object-fit:contain;
+
+    border-radius:10px;
+
+}
+
+
+
+.price{
+
+    color:#28a745;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+}
+
+
+
+.info-btn{
+
+    display:inline-block;
+
+    background:#007bff;
+
+    color:white;
+
+    text-decoration:none;
+
+    padding:12px 20px;
+
+    border-radius:8px;
+
+}
+
+
+
+.info-btn:hover{
+
+    background:#0056b3;
+
+}
+
+
+
+footer{
+
+    background:#222;
+
+    color:white;
+
+    text-align:center;
+
+    padding:20px;
+
+    margin-top:40px;
+
+}
+
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+
+<header>
+
+
+<div class="logo">
+
+Nexora
+
+</div>
+
+
+
+<nav>
+
+
+<a href="index.html">
+Home
+</a>
+
+
+<a href="chi-siamo.html">
+Chi siamo
+</a>
+
+
+<a href="faq.html">
+FAQ
+</a>
+
+
+<span class="user" id="utente"></span>
+
+
+<span class="logout" onclick="logout()">
+Esci
+</span>
+
+
+</nav>
+
+
+
+</header>
+
+
+
+
+
+<section class="search">
+
+
+<input
+
+id="search"
+
+type="text"
+
+placeholder="🔍 Cerca un prodotto..."
+
+onkeyup="searchProducts()">
+
+
+</section>
+
+
+
+
+
+
+<table class="product-table">
+
+
+<thead>
+
+<tr>
+
+<th>Immagine</th>
+
+<th>Nome</th>
+
+<th>Categoria</th>
+
+<th>Prezzo</th>
+
+<th>Informazioni</th>
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody id="products-body">
+
+</tbody>
+
+
+
+</table>
+
+
+
+
+
+
+<footer>
+
+© 2026 Nexora - Tutti i diritti riservati.
+
+</footer>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+
+<script>
+
+
+const SUPABASE_URL =
+"https://itpelsmskhhbioxvmwyz.supabase.co";
+
+
+
+const SUPABASE_KEY =
+"sb_publishable_kuP2u6Nj2_fnv6bj34V2Uw_3gSILieK";
+
+
+
+
+const client = supabase.createClient(
+
+SUPABASE_URL,
+
+SUPABASE_KEY
+
+);
+
+
+
+
+
+
+
+async function controlloAccesso(){
+
+
+
+const {data,error}=await client.auth.getSession();
+
+
+
+
+if(error){
+
+console.error(error);
+
+return;
+
+}
+
+
+
+
+if(!data.session){
+
+
+window.location.href="registrazione.html";
+
+
+return;
+
+
+}
+
+
+
+
+
+
+if(!data.session.user.email_confirmed_at){
+
+
+await client.auth.signOut();
+
+
+window.location.href="registrazione.html";
+
+
+return;
+
+
+}
+
+
+
+
+
+document.getElementById("utente").innerHTML=
+
+data.session.user.email;
+
+
+
+caricaProdotti();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+async function caricaProdotti(){
+
+
+
+const {data,error}=await client
+
+.from("prodotti")
+
+.select("*")
+
+.order("id");
+
+
+
+
+
+console.log("Prodotti:",data);
+
+
+
+if(error){
+
+
+console.error(error);
+
+return;
+
+
+}
+
+
+
+
+
+const tbody=document.getElementById(
+"products-body"
+);
+
+
+
+tbody.innerHTML="";
+
+
+
+
+
+data.forEach(prodotto=>{
+
+
+tbody.innerHTML += `
+
+
+<tr>
+
+
+<td>
+
+<img
+
+src="${prodotto.immagine}"
+
+alt="${prodotto.nome}"
+
+onerror="this.src='https://via.placeholder.com/300'">
+
+
+</td>
+
+
+
+
+<td>
+
+${prodotto.nome}
+
+</td>
+
+
+
+
+<td>
+
+${prodotto.categoria}
+
+</td>
+
+
+
+
+<td class="price">
+
+${prodotto.prezzo}€
+
+</td>
+
+
+
+
+<td>
+
+<a
+
+href="${prodotto.pagina}"
+
+class="info-btn">
+
+Maggiori informazioni
+
+</a>
+
+
+</td>
+
+
+</tr>
+
+
+`;
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function searchProducts(){
+
+
+
+let testo=document
+
+.getElementById("search")
+
+.value
+
+.toLowerCase();
+
+
+
+
+let righe=document.querySelectorAll(
+"#products-body tr"
+);
+
+
+
+
+
+righe.forEach(riga=>{
+
+
+let nome=riga.cells[1]
+
+.textContent
+
+.toLowerCase();
+
+
+
+let categoria=riga.cells[2]
+
+.textContent
+
+.toLowerCase();
+
+
+
+
+
+if(
+
+nome.includes(testo)
+
+||
+
+categoria.includes(testo)
+
+){
+
+
+riga.style.display="";
+
+
+}else{
+
+
+riga.style.display="none";
+
+
+}
+
+
+
+});
+
+
+
+}
+
+
+
+
+
+
+
+async function logout(){
+
+
+
+await client.auth.signOut();
+
+
+
+window.location.href="registrazione.html";
+
+
+
+}
+
+
+
+
+
+
+controlloAccesso();
+
+
+
+</script>
+
+
+</body>
+
+</html>

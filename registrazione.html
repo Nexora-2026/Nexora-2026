@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Accesso Nexora</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+}
+
+
+.box{
+
+    width:350px;
+    background:white;
+    padding:30px;
+    margin:100px auto;
+
+    border-radius:10px;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.2);
+
+}
+
+
+h1{
+
+    text-align:center;
+    margin-bottom:10px;
+
+}
+
+
+h3{
+
+    text-align:center;
+    margin-bottom:20px;
+
+}
+
+
+input{
+
+    width:100%;
+    padding:12px;
+
+    margin-top:15px;
+
+    border:1px solid #ccc;
+
+    border-radius:5px;
+
+    font-size:16px;
+
+}
+
+
+
+button{
+
+    width:100%;
+
+    padding:12px;
+
+    margin-top:20px;
+
+    background:#007bff;
+
+    color:white;
+
+    border:none;
+
+    border-radius:5px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+}
+
+
+button:hover{
+
+    background:#0056b3;
+
+}
+
+
+
+#cambia{
+
+    background:#28a745;
+
+}
+
+
+
+#messaggio{
+
+    text-align:center;
+
+    margin-top:20px;
+
+    font-weight:bold;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+
+<div class="box">
+
+
+<h1>
+Nexora
+</h1>
+
+
+<h3 id="titolo">
+Accesso
+</h3>
+
+
+
+<input
+
+type="email"
+
+id="email"
+
+placeholder="Email">
+
+
+
+<input
+
+type="password"
+
+id="password"
+
+placeholder="Password">
+
+
+
+<button onclick="azione()" id="mainBtn">
+
+Accedi
+
+</button>
+
+
+
+<button onclick="cambiaModalita()" id="cambia">
+
+Non ho un account
+
+</button>
+
+
+
+<div id="messaggio"></div>
+
+
+
+</div>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+
+const SUPABASE_URL =
+"https://itpelsmskhhbioxvmwyz.supabase.co";
+
+
+const SUPABASE_KEY =
+"sb_publishable_kuP2u6Nj2_fnv6bj34V2Uw_3gSILieK";
+
+
+
+const client = supabase.createClient(
+
+SUPABASE_URL,
+
+SUPABASE_KEY
+
+);
+
+
+
+
+
+let registrazione=false;
+
+
+
+
+
+
+function cambiaModalita(){
+
+
+registrazione=!registrazione;
+
+
+let titolo=document.getElementById("titolo");
+
+let btn=document.getElementById("mainBtn");
+
+let cambia=document.getElementById("cambia");
+
+
+
+if(registrazione){
+
+
+titolo.innerHTML="Registrazione";
+
+btn.innerHTML="Registrati";
+
+cambia.innerHTML="Ho già un account";
+
+
+}else{
+
+
+titolo.innerHTML="Accesso";
+
+btn.innerHTML="Accedi";
+
+cambia.innerHTML="Non ho un account";
+
+
+}
+
+
+
+document.getElementById("messaggio").innerHTML="";
+
+
+}
+
+
+
+
+
+
+
+
+async function azione(){
+
+
+
+let email=document
+
+.getElementById("email")
+
+.value.trim();
+
+
+
+let password=document
+
+.getElementById("password")
+
+.value;
+
+
+
+let messaggio=document
+
+.getElementById("messaggio");
+
+
+
+
+
+if(email==="" || password===""){
+
+
+messaggio.innerHTML=
+"Inserisci email e password";
+
+
+messaggio.style.color="red";
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+if(registrazione){
+
+
+
+const {data,error}=await client.auth.signUp({
+
+
+email:email,
+
+
+password:password
+
+
+});
+
+
+
+if(error){
+
+
+messaggio.innerHTML=
+"Errore: "+error.message;
+
+
+messaggio.style.color="red";
+
+
+return;
+
+
+}
+
+
+
+messaggio.innerHTML=
+"Account creato!";
+
+
+messaggio.style.color="green";
+
+
+
+setTimeout(()=>{
+
+
+window.location.href="index.html";
+
+
+},1000);
+
+
+
+}
+
+else{
+
+
+
+
+
+const {data,error}=await client.auth.signInWithPassword({
+
+
+email:email,
+
+
+password:password
+
+
+});
+
+
+
+
+if(error){
+
+
+messaggio.innerHTML=
+"Email o password errati";
+
+
+messaggio.style.color="red";
+
+
+return;
+
+
+}
+
+
+
+
+messaggio.innerHTML=
+"Accesso riuscito!";
+
+
+messaggio.style.color="green";
+
+
+
+setTimeout(()=>{
+
+
+window.location.href="index.html";
+
+
+},1000);
+
+
+
+}
+
+
+
+
+
+}
+
+
+
+
+
+</script>
+
+
+</body>
+
+</html>
